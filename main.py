@@ -1,46 +1,66 @@
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtWidgets import QApplication, QMainWindow, QGraphicsView, QGraphicsScene, QGraphicsRectItem
 
-import sys
 
-class Window(QMainWindow):
+class MainWin(QMainWindow):
     def __init__(self):
-        super(Window, self).__init__()
+        super().__init__()
+        self.setWindowTitle('')
+        self.setFixedSize(1280, 720)
+        self.main_screen()
 
-        self.setWindowTitle('ARCANOID')
-        self.setGeometry(600, 150, 800, 800)
+    def main_screen(self):
+        self.clear_window()
 
-        self.zagolovok = QtWidgets.QLabel(self)
-        self.zagolovok.setText('ARCANOID')
-        self.zagolovok.move(375, 300)
+        self.setStyleSheet('background-image: url("menu.jpg");')
 
-        self.btn_start_game = QtWidgets.QPushButton(self)
-        self.btn_start_game.move(310, 400)
-        self.btn_start_game.setText('ИГРАТЬ')
-        self.btn_start_game.setFixedSize(200, 90)
+        btn_style = "border-radius: 35px;" \
+                    "background: #008cff;" \
+                    "color: #f7dfea;" \
+                    "font-size: 20px"
+
+        self.btnTs1 = QtWidgets.QPushButton('ИГРАТЬ', self)
+        self.btnTs1.setGeometry(874, 106, 260, 120)
+        self.btnTs1.setStyleSheet(btn_style)
+        self.btnTs1.show()
+
+        self.btnTs2 = QtWidgets.QPushButton('РЕЗУЛЬТАТЫ', self)
+        self.btnTs2.setGeometry(874, 264, 260, 120)
+        self.btnTs2.clicked.connect(self.second_screen)
+        self.btnTs2.setStyleSheet(btn_style)
+        self.btnTs2.show()
+
+        self.btnTs3 = QtWidgets.QPushButton('ВЫХОД', self)
+        self.btnTs3.setGeometry(874, 422, 260, 120)
+        self.btnTs3.clicked.connect(quit)
+        self.btnTs3.setStyleSheet(btn_style)
+        self.btnTs3.show()
+
+    def second_screen(self):
+        self.clear_window()
+
+        self.setStyleSheet('background-image: url("rezult.png");')
+
+        self.btns2 = QtWidgets.QPushButton('', self)
+        self.btns2.setGeometry(0, 0, 100, 100)
+        self.btns2.setIcon(QtGui.QIcon('nazad.png'))
+        self.btns2.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.btns2.show()
+        self.btns2.clicked.connect(self.main_screen)
 
 
-        self.btn_rezult = QtWidgets.QPushButton(self)
-        self.btn_rezult.move(310, 500)
-        self.btn_rezult.setText('РЕЗУЛЬТАТЫ')
-        self.btn_rezult.setFixedSize(200, 90)
+    def clear_window(self):
+        self.setStyleSheet('background-image: none!important;')
+        for widget in self.findChildren(QtWidgets.QWidget):
+            widget.deleteLater()
 
-        self.btn_exit = QtWidgets.QPushButton(self)
-        self.btn_exit.move(310, 600)
-        self.btn_exit.setText('ВЫХОД')
-        self.btn_exit.setFixedSize(200, 90)
-        self.btn_exit.clicked.connect(quit)
 
-class GameWin(QtWidgets):
-    def __init__(self):
-        super(GameWin, self).__iniy__()
-
-def application():
-    app = QApplication(sys.argv)
-    window = Window()
-
+def run_app():
+    app = QApplication([])
+    window = MainWin()
     window.show()
-    sys.exit(app.exec_())
+    app.exec_()
+
 
 if __name__ == '__main__':
-    application()
+    run_app()
