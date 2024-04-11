@@ -38,21 +38,32 @@ class MainWin(QMainWindow):
         self.btnTs3.setStyleSheet(btn_style)
         self.btnTs3.show()
 
-
-
     def start_game(self):
         self.clear_window()
         self.setStyleSheet('background-image: url("play.jpg");')
 
+        for i in range(5):
+            block = QLabel(self)
+            block.setStyleSheet("""
+                                    border-radius: 0px;
+                                    min-height: 30px;
+                                    max-height: 30px;
+                                    min-width: 100px;
+                                    max-width: 100px;
+                                    background: red;
+                                """)
+            block.move(285 + i * 150, 90)  # Размещение платформ на равном расстоянии друг от друга
+            block.show()
+
         self.fongame = QLabel(self)
         self.fongame.setStyleSheet("""
-                                            border-radius: 0px;
-                                            min-height: 600px;
-                                            max-height: 600px;
-                                            min-width: 800px;
-                                            max-width: 800px;
-                                            background: white;
-                                        """)
+                                    border-radius: 0px;
+                                    min-height: 600px;
+                                    max-height: 600px;
+                                    min-width: 800px;
+                                    max-width: 800px;
+                                    background: white;
+                                """)
         opacity_effect = QGraphicsOpacityEffect()
         opacity_effect.setOpacity(0.7)
         self.fongame.setGraphicsEffect(opacity_effect)
@@ -65,12 +76,12 @@ class MainWin(QMainWindow):
 
         self.line = QLabel(self)
         self.line.setStyleSheet("""
-                                            min-height: 10px;
-                                            max-height: 10px;
-                                            min-width: 800px;
-                                            max-width: 800px;
-                                            background: black;
-                                        """)
+                                    min-height: 10px;
+                                    max-height: 10px;
+                                    min-width: 800px;
+                                    max-width: 800px;
+                                    background: black;
+                                """)
         self.line.move(240, 601)
         self.line.show()
 
@@ -79,13 +90,13 @@ class MainWin(QMainWindow):
 
         self.ball = QLabel(self)
         self.ball.setStyleSheet("""
-                                            border-radius: 15;
-                                            min-height: 30px;
-                                            max-height: 30px;
-                                            min-width: 30px;
-                                            max-width: 30px;
-                                            background: black;
-                                        """)
+                                    border-radius: 15;
+                                    min-height: 30px;
+                                    max-height: 30px;
+                                    min-width: 30px;
+                                    max-width: 30px;
+                                    background: black;
+                                """)
         self.ball.move(640, 300)
         self.ball.show()
 
@@ -112,11 +123,24 @@ class MainWin(QMainWindow):
         if self.ball.x() <= 240 or self.ball.x() >= 1040 - self.ball.width():
             self.x_speed *= -1
 
-        if self.ball.y() <= 60 or self.ball.y() >= 660 - self.ball.height():
+        if self.ball.y() <= 60:
             self.y_speed *= -1
+
+        if self.ball.y() >= 600 - self.ball.height():
+            # Логика для завершения игры при падении мяча
+            self.timer.stop()
+            self.clear_window()
+            self.main_screen()
+            return
 
         if self.ball.geometry().intersects(self.platform.geometry()):
             self.y_speed *= -1
+
+        for block in self.findChildren(QtWidgets.QLabel):
+            if block.objectName() == "block" and block.geometry().intersects(self.ball.geometry()):
+                block.deleteLater()
+                self.x_speed *= -1
+                self.y_speed *= -1
 
         self.ball.move(self.ball.x() + self.x_speed, self.ball.y() + self.y_speed)
 
@@ -126,10 +150,10 @@ class MainWin(QMainWindow):
             if self.platform.x() <= 240:
                 self.platform.move(self.platform.x() - 0, self.platform.y())
             else:
-                self.platform.move(self.platform.x() - 25, self.platform.y())
+                self.platform.move(self.platform.x() - 50, self.platform.y())
         elif event.key() == Qt.Key_Right:
-            if self.platform.x() + 125 <= 1040:
-                self.platform.move(self.platform.x() + 25, self.platform.y())
+            if self.platform.x() + 150 <= 1040:
+                self.platform.move(self.platform.x() + 50, self.platform.y())
             else:
                 self.platform.move(self.platform.x() + 0, self.platform.y())
 
