@@ -8,7 +8,7 @@ from PyQt5.QtCore import QTimer, Qt
 class MainWin(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.fongame = None
+        # self.fongame = None
         self.setWindowTitle('ARCANOID')
         self.setFixedSize(1280, 720)
         self.main_screen()
@@ -79,7 +79,7 @@ class MainWin(QMainWindow):
 
         self.ball = QLabel(self)
         self.ball.setStyleSheet("""
-                                            border-radius: 15px;
+                                            border-radius: 15;
                                             min-height: 30px;
                                             max-height: 30px;
                                             min-width: 30px;
@@ -98,13 +98,12 @@ class MainWin(QMainWindow):
                                     max-width: 100px;
                                     background: blue;
                                 """)
-        # border - image: url("plat.png");
         self.platform.move(590, 550)
         self.platform.show()
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.game_loop)
-        self.timer.start(5)
+        self.timer.start(10)
 
     def game_loop(self):
         self.ball.move(self.ball.x() + self.x_speed, self.ball.y() + self.y_speed)
@@ -116,20 +115,11 @@ class MainWin(QMainWindow):
         if self.ball.y() <= 60 or self.ball.y() >= 660 - self.ball.height():
             self.y_speed *= -1
 
-        # Проверка столкновения с платформой
-        # if self.ball.intersects(self.platform):
-            # Реакция на столкновение: отскок мяча
-            # if self.x_speed > 0:
-            #     self.ball.set_pos(self.platform.x() - self.ball.width(), self.ball.y())
-            # else:
-            #     self.ball.set_pos(self.platform.x() + self.platform.width(), self.ball.y())
-            # self.x_speed *= -1
+        if self.ball.geometry().intersects(self.platform.geometry()):
+            self.y_speed *= -1
 
-            # if self.y_speed > 0:
-            #     self.ball.set_pos(self.ball.x(), self.platform.y() - self.ball.height())
-            # else:
-            #     self.ball.set_pos(self.ball.x(), self.platform.y() + self.platform.height())
-            # self.y_speed *= -1
+        self.ball.move(self.ball.x() + self.x_speed, self.ball.y() + self.y_speed)
+
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Left:
@@ -145,16 +135,23 @@ class MainWin(QMainWindow):
 
     def second_screen(self):
         self.clear_window()
-        self.setStyleSheet("""
-                            background-image: url("rezult.png");
-                            size: 1280, 920;
-                           """)
         self.btns2 = QtWidgets.QPushButton('', self)
         self.btns2.setGeometry(0, 0, 100, 100)
-        self.btns2.setIcon(QtGui.QIcon('nazad.png'))
-        self.btns2.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.btns2.show()
+        self.btns2.setIcon(QtGui.QIcon('naza2.png'))
         self.btns2.clicked.connect(self.main_screen)
+        self.btns2.setStyleSheet("""
+                                    min-height: 100px;
+                                    max-height: 100px;
+                                    min-width: 100px;
+                                    max-width: 100px;
+                                    border: none;
+                                    margin: 0px;
+                                    padding: 0px;
+                                    """)
+        self.setStyleSheet("""
+                            background-image: url("rezult.png");
+                                           """)
+        self.btns2.show()
 
         self.fonrez = QLabel(self)
         self.fonrez.setStyleSheet("""
