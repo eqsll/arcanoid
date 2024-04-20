@@ -8,7 +8,9 @@ from PyQt5.QtCore import QTimer, Qt
 class MainWin(QMainWindow):
     def __init__(self):
         super().__init__()
-        # self.fongame = None
+        self.colblock = 5
+        self.kolohehi = 0
+        self.lives = 3
         self.setWindowTitle('ARCANOID')
         self.setFixedSize(1280, 720)
         self.main_screen()
@@ -55,7 +57,6 @@ class MainWin(QMainWindow):
                                 """)
             block.move(285 + i * 150, 90)  # Размещение платформ на равном расстоянии друг от друга
             block.show()
-
 
         self.fongame = QLabel(self)
         self.fongame.setStyleSheet("""
@@ -109,10 +110,38 @@ class MainWin(QMainWindow):
                                     max-height: 25px;
                                     min-width: 100px;
                                     max-width: 100px;
-                                    background: blue;
+                                    background: black;
                                 """)
         self.platform.move(590, 550)
         self.platform.show()
+
+        self.score = QLabel(self)
+        self.score.setText(str(self.lives))
+        self.score.setStyleSheet("""
+                                    min-height: 30px;
+                                    max-height: 30px;
+                                    min-width: 30px;
+                                    max-width: 30px;
+                                    background: transparent;
+                                    font-size: 30px;
+                                    text-align: center;
+                                """)
+        self.score.move(940, 620)
+        self.score.show()
+
+        self.ohehi = QLabel(self)
+        self.ohehi.setText(str(self.kolohehi))
+        self.ohehi.setStyleSheet("""
+                                            min-height: 30px;
+                                            max-height: 30px;
+                                            min-width: 30px;
+                                            max-width: 30px;
+                                            background: transparent;
+                                            font-size: 30px;
+                                            text-align: center;
+                                        """)
+        self.ohehi.move(330, 620)
+        self.ohehi.show()
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.game_loop)
@@ -127,25 +156,48 @@ class MainWin(QMainWindow):
         if self.ball.y() <= 60:
             self.y_speed *= -1
 
-        if self.ball.y() >= 600 - self.ball.height(): # Логика для завершения игры при падении мяча
-            self.timer.stop()
-            self.clear_window()
-            self.main_screen()
-            return
-
-        if self.ball.geometry().intersects(self.platform.geometry()):
-           self.y_speed *= -1
+        if self.ball.y() >= 600 - self.ball.height():
+            self.lives -= 1  # Уменьшаем количество жизней при вылете мяча за нижнюю границу
+            self.score.setText(str(self.lives))
+            if self.lives == 0:
+                self.timer.stop()
+                self.main_screen()
+                self.lives += 3
+            else:
+                self.ball.move(640, 300)  # Возвращаем мяч в начальное положение
+        else:
+            if self.ball.geometry().intersects(self.platform.geometry()):
+                self.y_speed *= -1
 
         for block in self.findChildren(QtWidgets.QLabel):
-
-            if (block.geometry().width()==105) and (self.ball.geometry().intersects(block.geometry())):
+            if (block.geometry().width() == 105) and (self.ball.geometry().intersects(block.geometry())):
                 self.y_speed *= -1
+                self.colblock -= 1
                 block.deleteLater()
+
+                if self.colblock == 0:
+                    if self.lives < 3:
+                        self.lives += 1
+                    self.clear_window()
+                    self.start_game()
+                    self.kolohehi += 20
+                    self.ohehi.setText(str(self.kolohehi))
+                    self.colblock += 5
+
+
+                    if self.kolohehi >= 40:
+                        self.timer.stop()
+                        self.main_screen()
+
+
+
+
 
         self.ball.move(self.ball.x() + self.x_speed, self.ball.y() + self.y_speed)
 
-
     def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.close()
         if event.key() == Qt.Key_Left:
             if self.platform.x() <= 240:
                 self.platform.move(self.platform.x() - 0, self.platform.y())
@@ -159,23 +211,22 @@ class MainWin(QMainWindow):
 
     def second_screen(self):
         self.clear_window()
+        self.setStyleSheet("""background-image: url("rezult.png");""")
         self.btns2 = QtWidgets.QPushButton('', self)
         self.btns2.setGeometry(0, 0, 100, 100)
-        self.btns2.setIcon(QtGui.QIcon('naza2.png'))
+        # self.btns2.setIcon(QtGui.QIcon('naz.png'))
         # self.btns2.iconSize(100,100)
-        self.btns2.clicked.connect(self.main_screen)
         self.btns2.setStyleSheet("""
-                                    min-height: 100px;
-                                    max-height: 100px;
+                                    background-image: url("naz.jpg");
+                                    min-height: 93px;
+                                    max-height: 93px;
                                     min-width: 100px;
                                     max-width: 100px;
                                     border: none;
                                     margin: 0px;
                                     padding: 0px;
                                     """)
-        self.setStyleSheet("""
-                            background-image: url("rezult.png");
-                                           """)
+        self.btns2.clicked.connect(self.main_screen)
         self.btns2.show()
 
         self.fonrez = QLabel(self)
