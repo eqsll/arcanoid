@@ -1,9 +1,9 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtGui import QPixmap, QFont
-from PyQt5.QtWidgets import QApplication, QMainWindow, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QLabel, \
-    QGraphicsEllipseItem, QGraphicsOpacityEffect, QVBoxLayout
-from PyQt5.QtCore import QTimer, Qt
+import random
 
+from PyQt5 import QtWidgets
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGraphicsOpacityEffect
+from PyQt5.QtCore import QTimer, Qt
 
 class MainWin(QMainWindow):
     def __init__(self):
@@ -14,6 +14,14 @@ class MainWin(QMainWindow):
         self.setWindowTitle('ARCANOID')
         self.setFixedSize(1280, 720)
         self.main_screen()
+
+    def game_over(self):
+        self.clear_window()
+        self.setStyleSheet('background-image: url("gameov.jpg");')
+
+    def game_win(self):
+        self.clear_window()
+        self.setStyleSheet('background-image: url("gamewin.png");')
 
     def main_screen(self):
         self.clear_window()
@@ -46,7 +54,6 @@ class MainWin(QMainWindow):
 
         for i in range(5):
             block = QLabel(self)
-
             block.setStyleSheet("""
                                     border-radius: 0px;
                                     min-height: 30px;
@@ -88,8 +95,8 @@ class MainWin(QMainWindow):
         self.line.move(240, 601)
         self.line.show()
 
-        self.x_speed = 1
-        self.y_speed = -1
+        self.x_speed = random.choice([-1, 1])
+        self.y_speed = random.choice([-1, 1])
 
         self.ball = QLabel(self)
         self.ball.setStyleSheet("""
@@ -100,7 +107,7 @@ class MainWin(QMainWindow):
                                     max-width: 30px;
                                     background: black;
                                 """)
-        self.ball.move(640, 300)
+        self.ball.move(640, 520)
         self.ball.show()
 
         self.platform = QLabel(self)
@@ -161,10 +168,12 @@ class MainWin(QMainWindow):
             self.score.setText(str(self.lives))
             if self.lives == 0:
                 self.timer.stop()
-                self.main_screen()
+                self.game_over()
                 self.lives += 3
+                self.kolohehi = 0
             else:
-                self.ball.move(640, 300)  # Возвращаем мяч в начальное положение
+                self.ball.move(640, 520)  # Возвращаем мяч в начальное положение
+                self.platform.move(590, 550) # Возвращаем платформу в начальное положение
         else:
             if self.ball.geometry().intersects(self.platform.geometry()):
                 self.y_speed *= -1
@@ -184,10 +193,10 @@ class MainWin(QMainWindow):
                     self.ohehi.setText(str(self.kolohehi))
                     self.colblock += 5
 
-
-                    if self.kolohehi >= 40:
+                    if self.kolohehi >= 100:
+                        self.kolohehi = 0
                         self.timer.stop()
-                        self.main_screen()
+                        self.game_win()
 
 
 
@@ -198,6 +207,8 @@ class MainWin(QMainWindow):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.close()
+        if event.key() == Qt.Key_Space:
+            self.main_screen()
         if event.key() == Qt.Key_Left:
             if self.platform.x() <= 240:
                 self.platform.move(self.platform.x() - 0, self.platform.y())
@@ -214,8 +225,6 @@ class MainWin(QMainWindow):
         self.setStyleSheet("""background-image: url("rezult.png");""")
         self.btns2 = QtWidgets.QPushButton('', self)
         self.btns2.setGeometry(0, 0, 100, 100)
-        # self.btns2.setIcon(QtGui.QIcon('naz.png'))
-        # self.btns2.iconSize(100,100)
         self.btns2.setStyleSheet("""
                                     background-image: url("naz.jpg");
                                     min-height: 93px;
@@ -231,13 +240,13 @@ class MainWin(QMainWindow):
 
         self.fonrez = QLabel(self)
         self.fonrez.setStyleSheet("""
-                                                    border-radius: 110px;
-                                                    min-height: 600px;
-                                                    max-height: 600px;
-                                                    min-width: 800px;
-                                                    max-width: 800px;
-                                                    background: white;
-                                                """)
+                                        border-radius: 110px;
+                                        min-height: 600px;
+                                        max-height: 600px;
+                                        min-width: 800px;
+                                        max-width: 800px;
+                                        background: white;
+                                        """)
         opacity_effect = QGraphicsOpacityEffect()
         opacity_effect.setOpacity(0.2)
         self.fonrez.setGraphicsEffect(opacity_effect)
@@ -250,13 +259,13 @@ class MainWin(QMainWindow):
 
         self.rezline = QLabel(self)
         self.rezline.setStyleSheet("""
-                                                    border-radius: 5; 
-                                                    min-height: 10px;
-                                                    max-height: 10px;
-                                                    min-width: 700px;
-                                                    max-width: 700px;
-                                                    background: black;
-                                                """)
+                                        border-radius: 5; 
+                                        min-height: 10px;
+                                        max-height: 10px;
+                                        min-width: 700px;
+                                        max-width: 700px;
+                                        background: black;
+                                        """)
         self.rezline.move(290, 130)
         self.rezline.show()
 
@@ -268,14 +277,14 @@ class MainWin(QMainWindow):
         self.label.show()
 
         self.label = QLabel('ОЧКИ', self)
-        self.label.setStyleSheet('background: transparent;')  # Установка прозрачного фона
+        self.label.setStyleSheet('background: transparent;')
         self.label.setFont(QFont('Arial', 20))
         self.label.adjustSize()
         self.label.move(800, 160)
         self.label.show()
 
         self.label = QLabel('РЕЗУЛЬТАТЫ', self)
-        self.label.setStyleSheet('background: transparent;')  # Установка прозрачного фона
+        self.label.setStyleSheet('background: transparent;')
         self.label.setFont(QFont('Arial', 25))
         self.label.adjustSize()
         self.label.move(510, 80)
