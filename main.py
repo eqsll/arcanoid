@@ -17,11 +17,11 @@ class MainWin(QMainWindow):
 
     def game_over(self):
         self.clear_window()
-        self.setStyleSheet('background-image: url("gameov.jpg");')
+        self.setStyleSheet('background-image: url("poraj.png");')
 
     def game_win(self):
         self.clear_window()
-        self.setStyleSheet('background-image: url("gamewin.png");')
+        self.setStyleSheet('background-image: url("pob.png");')
 
     def main_screen(self):
         self.clear_window()
@@ -107,7 +107,7 @@ class MainWin(QMainWindow):
                                     max-width: 30px;
                                     background: black;
                                 """)
-        self.ball.move(640, 520)
+        self.ball.move(625, 520)
         self.ball.show()
 
         self.platform = QLabel(self)
@@ -152,9 +152,9 @@ class MainWin(QMainWindow):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.game_loop)
-        self.timer.start(10)
 
     def game_loop(self):
+        self.timer.start(10)
         self.ball.move(self.ball.x() + self.x_speed, self.ball.y() + self.y_speed)
 
         if self.ball.x() <= 240 or self.ball.x() >= 1040 - self.ball.width():
@@ -172,7 +172,8 @@ class MainWin(QMainWindow):
                 self.lives += 3
                 self.kolohehi = 0
             else:
-                self.ball.move(640, 520)  # Возвращаем мяч в начальное положение
+                self.timer.stop()
+                self.ball.move(625, 520)  # Возвращаем мяч в начальное положение
                 self.platform.move(590, 550) # Возвращаем платформу в начальное положение
         else:
             if self.ball.geometry().intersects(self.platform.geometry()):
@@ -189,11 +190,11 @@ class MainWin(QMainWindow):
                         self.lives += 1
                     self.clear_window()
                     self.start_game()
-                    self.kolohehi += 20
+                    self.kolohehi += 100
                     self.ohehi.setText(str(self.kolohehi))
                     self.colblock += 5
 
-                    if self.kolohehi >= 100:
+                    if self.kolohehi >= 20:
                         self.kolohehi = 0
                         self.timer.stop()
                         self.game_win()
@@ -205,9 +206,12 @@ class MainWin(QMainWindow):
         self.ball.move(self.ball.x() + self.x_speed, self.ball.y() + self.y_speed)
 
     def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Space:
+            self.timer.start(10)
         if event.key() == Qt.Key_Escape:
             self.close()
-        if event.key() == Qt.Key_Space:
+        if event.key() == Qt.Key_Backspace:
+            self.timer.stop()
             self.main_screen()
         if event.key() == Qt.Key_Left:
             if self.platform.x() <= 240:
