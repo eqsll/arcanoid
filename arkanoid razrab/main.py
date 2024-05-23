@@ -1,27 +1,51 @@
+import re
 import random
-
+import json
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGraphicsOpacityEffect
 from PyQt5.QtCore import QTimer, Qt
 
+
 class MainWin(QMainWindow):
     def __init__(self):
         super().__init__()
         self.colblock = 5
+        self.kolzap = 0
         self.kolohehi = 0
         self.lives = 3
         self.setWindowTitle('ARCANOID')
         self.setFixedSize(1280, 720)
         self.main_screen()
 
-    def game_over(self):
-        self.clear_window()
-        self.setStyleSheet('background-image: url("poraj.png");')
-
     def game_win(self):
         self.clear_window()
         self.setStyleSheet('background-image: url("pob.png");')
+        self.timer.stop()
+
+    def game_over(self):
+        self.clear_window()
+        self.setStyleSheet('background-image: url("poraj.png");')
+        self.timer.stop()
+
+    def pravila(self):
+        self.clear_window()
+        self.setStyleSheet('background-image: url("pravila.png");')
+
+        self.btns5 = QtWidgets.QPushButton('', self)
+        self.btns5.setGeometry(0, 0, 100, 100)
+        self.btns5.setStyleSheet("""
+                                            background-image: url("naz.png");
+                                            min-height: 100px;
+                                            max-height: 100px;
+                                            min-width: 100px;
+                                            max-width: 100px;
+                                            border: none;
+                                            margin: 0px;
+                                            padding: 0px;
+                                            """)
+        self.btns5.clicked.connect(self.main_screen)
+        self.btns5.show()
 
     def main_screen(self):
         self.clear_window()
@@ -30,6 +54,7 @@ class MainWin(QMainWindow):
                     "background: #008cff;" \
                     "color: #f7dfea;" \
                     "font-size: 20px"
+
         self.btnTs1 = QtWidgets.QPushButton('ИГРАТЬ', self)
         self.btnTs1.setGeometry(874, 106, 260, 120)
         self.btnTs1.clicked.connect(self.start_game)
@@ -44,9 +69,24 @@ class MainWin(QMainWindow):
 
         self.btnTs3 = QtWidgets.QPushButton('ВЫХОД', self)
         self.btnTs3.setGeometry(874, 422, 260, 120)
-        self.btnTs3.clicked.connect(quit)
+        self.btnTs3.clicked.connect(self.clear_results_quit)
         self.btnTs3.setStyleSheet(btn_style)
         self.btnTs3.show()
+
+        self.btns4 = QtWidgets.QPushButton('', self)
+        self.btns4.setGeometry(0, 0, 100, 100)
+        self.btns4.setStyleSheet("""
+                                            background-image: url("vop.png");
+                                            min-height: 100px;
+                                            max-height: 100px;
+                                            min-width: 100px;
+                                            max-width: 100px;
+                                            border: none;
+                                            margin: 0px;
+                                            padding: 0px;
+                                            """)
+        self.btns4.clicked.connect(self.pravila)
+        self.btns4.show()
 
     def start_game(self):
         self.clear_window()
@@ -139,15 +179,15 @@ class MainWin(QMainWindow):
         self.ohehi = QLabel(self)
         self.ohehi.setText(str(self.kolohehi))
         self.ohehi.setStyleSheet("""
-                                            min-height: 30px;
-                                            max-height: 30px;
-                                            min-width: 30px;
-                                            max-width: 30px;
+                                            min-height: 50px;
+                                            max-height: 50px;
+                                            min-width: 50px;
+                                            max-width: 50px;
                                             background: transparent;
                                             font-size: 30px;
                                             text-align: center;
                                         """)
-        self.ohehi.move(330, 620)
+        self.ohehi.move(330, 610)
         self.ohehi.show()
 
         self.timer = QTimer()
@@ -167,14 +207,22 @@ class MainWin(QMainWindow):
             self.lives -= 1  # Уменьшаем количество жизней при вылете мяча за нижнюю границу
             self.score.setText(str(self.lives))
             if self.lives == 0:
+                if self.kolzap < 2:
+                    with open('results.json') as json_file:
+                        data = json.load(json_file)
+                        data.append(self.kolohehi)
+                    with open('results.json', 'w') as outfile:
+                        json.dump(data, outfile)
+                        self.kolzap += 1
                 self.timer.stop()
                 self.game_over()
                 self.lives += 3
                 self.kolohehi = 0
+                self.colblock = 5
             else:
                 self.timer.stop()
-                self.ball.move(625, 519)  # Возвращаем мяч в начальное положение
-                self.platform.move(590, 550) # Возвращаем платформу в начальное положение
+                self.ball.move(625, 520)  # Возвращаем мяч в начальное положение
+                self.platform.move(590, 550)  # Возвращаем платформу в начальное положение
         else:
             if self.ball.geometry().intersects(self.platform.geometry()):
                 self.y_speed *= -1
@@ -194,28 +242,33 @@ class MainWin(QMainWindow):
                     self.ohehi.setText(str(self.kolohehi))
                     self.colblock += 5
 
-                    if self.kolohehi >= 100:
+                    if self.kolohehi >= 40:
+                        if self.kolzap < 10:
+                            with open('results.json') as json_file:
+                                data = json.load(json_file)
+                                data.append(self.kolohehi)
+                            with open('results.json', 'w') as outfile:
+                                json.dump(data, outfile)
+                                self.kolzap += 1
                         self.kolohehi = 0
                         self.timer.stop()
                         self.game_win()
 
-
-
-
-
         self.ball.move(self.ball.x() + self.x_speed, self.ball.y() + self.y_speed)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Space:
+        if event.key() == Qt.Key_Up:
             self.timer.start(10)
+
         if event.key() == Qt.Key_Escape:
+            self.clear_results()
             self.close()
-        if event.key() == Qt.Key_Backspace:
-            self.timer.stop()
+
+        if event.key() == Qt.Key_Space:
             self.main_screen()
 
         if event.key() == Qt.Key_Left:
-            if (self.ball.x() >= 300) and (self.ball.y() == 520):
+            if (self.ball.x() >= 300) and (self.ball.y() == 520 or self.ball.y() == 519 or self.ball.y() == 521):
                 self.ball.move(self.ball.x() - 50, self.ball.y())
             else:
                 self.ball.move(self.ball.x() - 0, self.ball.y())
@@ -226,7 +279,7 @@ class MainWin(QMainWindow):
                 self.platform.move(self.platform.x() - 50, self.platform.y())
 
         elif event.key() == Qt.Key_Right:
-            if (self.ball.x() <= 950) and (self.ball.y() == 520):
+            if (self.ball.x() <= 950) and (self.ball.y() == 520 or self.ball.y() == 519 or self.ball.y() == 521):
                 self.ball.move(self.ball.x() + 50, self.ball.y())
             else:
                 self.ball.move(self.ball.x() + 0, self.ball.y())
@@ -242,9 +295,9 @@ class MainWin(QMainWindow):
         self.btns2 = QtWidgets.QPushButton('', self)
         self.btns2.setGeometry(0, 0, 100, 100)
         self.btns2.setStyleSheet("""
-                                    background-image: url("naz.jpg");
-                                    min-height: 93px;
-                                    max-height: 93px;
+                                    background-image: url("naz.png");
+                                    min-height: 100px;
+                                    max-height: 100px;
                                     min-width: 100px;
                                     max-width: 100px;
                                     border: none;
@@ -285,20 +338,6 @@ class MainWin(QMainWindow):
         self.rezline.move(290, 130)
         self.rezline.show()
 
-        self.label = QLabel('ПОПЫТКА', self)
-        self.label.setStyleSheet('background: transparent;')  # Установка прозрачного фона
-        self.label.setFont(QFont('Arial', 20))
-        self.label.adjustSize()
-        self.label.move(320, 160)
-        self.label.show()
-
-        self.label = QLabel('ОЧКИ', self)
-        self.label.setStyleSheet('background: transparent;')
-        self.label.setFont(QFont('Arial', 20))
-        self.label.adjustSize()
-        self.label.move(800, 160)
-        self.label.show()
-
         self.label = QLabel('РЕЗУЛЬТАТЫ', self)
         self.label.setStyleSheet('background: transparent;')
         self.label.setFont(QFont('Arial', 25))
@@ -306,9 +345,59 @@ class MainWin(QMainWindow):
         self.label.move(510, 80)
         self.label.show()
 
+        self.show_label('ПОПЫТКА', 350, 160)
+
+        self.show_label('ОЧКИ', 800, 160)
+
+        self.btn_clear_results = QtWidgets.QPushButton('ОЧИСТИТЬ', self)
+        self.btn_clear_results.setGeometry(490, 610, 300, 40)
+        self.btn_clear_results.setStyleSheet("""
+                                                border-radius: 35px;
+                                                background color: grey;
+                                                color: #f7dfea;
+                                                font-size: 20px;  
+                                                                    """)
+        self.btn_clear_results.clicked.connect(self.clear_results)
+        self.btn_clear_results.show()
+
+        with open('results.json') as json_file:
+            results = json.load(json_file)
+            horizontal_label = 200
+            if results:
+                for result in range(len(results)):
+
+                    self.show_label(str(results[result]), 820, horizontal_label)
+
+                    self.show_label(str(result + 1), 420, horizontal_label)
+
+                    horizontal_label += 40
+
+    def clear_results(self):
+        self.kolzap = 0
+        with open('results.json', 'r') as file:
+            data = file.read()
+
+        data_without_brackets = re.sub(r'\[.*?\]', '[]', data)
+
+        with open('results.json', 'w') as file:
+            file.write(data_without_brackets)
+        self.second_screen()
+
+    def clear_results_quit(self):
+        self.clear_results()
+        quit()
+
     def clear_window(self):
         for widget in self.findChildren(QtWidgets.QWidget):
             widget.deleteLater()
+
+    def show_label(self, text_label, horizontal, vertical):
+        self.label = QLabel(text_label, self)
+        self.label.setStyleSheet('background: transparent;')
+        self.label.setFont(QFont('Arial', 20))
+        self.label.adjustSize()
+        self.label.move(horizontal, vertical)
+        self.label.show()
 
 
 if __name__ == "__main__":
