@@ -3,7 +3,7 @@ import random
 import json
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGraphicsOpacityEffect
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGraphicsOpacityEffect, QMessageBox
 from PyQt5.QtCore import QTimer, Qt
 
 
@@ -89,109 +89,112 @@ class MainWin(QMainWindow):
         self.btns4.show()
 
     def start_game(self):
-        self.clear_window()
-        self.setStyleSheet('background-image: url("play.jpg");')
+        if self.kolzap == 10:
+            self.show_info_messagebox()
+        else:
+            self.clear_window()
+            self.setStyleSheet('background-image: url("play.jpg");')
 
-        for i in range(5):
-            block = QLabel(self)
-            block.setStyleSheet("""
-                                    border-radius: 0px;
-                                    min-height: 30px;
-                                    max-height: 30px;
-                                    min-width: 105px;
-                                    max-width: 105px;
-                                    background: red;
-                                """)
-            block.move(285 + i * 150, 90)  # Размещение платформ на равном расстоянии друг от друга
-            block.show()
+            for i in range(5):
+                block = QLabel(self)
+                block.setStyleSheet("""
+                                        border-radius: 0px;
+                                        min-height: 30px;
+                                        max-height: 30px;
+                                        min-width: 105px;
+                                        max-width: 105px;
+                                        background: red;
+                                    """)
+                block.move(285 + i * 150, 90)  # Размещение платформ на равном расстоянии друг от друга
+                block.show()
 
-        self.fongame = QLabel(self)
-        self.fongame.setStyleSheet("""
-                                    border-radius: 0px;
-                                    min-height: 600px;
-                                    max-height: 600px;
-                                    min-width: 800px;
-                                    max-width: 800px;
-                                    background: white;
-                                """)
-        opacity_effect = QGraphicsOpacityEffect()
-        opacity_effect.setOpacity(0.7)
-        self.fongame.setGraphicsEffect(opacity_effect)
-        self.fongame.move(240, 60)
-        self.fongame.setMaximumWidth(800)
-        self.fongame.setMaximumHeight(600)
-        self.fongame.setMinimumWidth(800)
-        self.fongame.setMinimumHeight(600)
-        self.fongame.show()
+            self.fongame = QLabel(self)
+            self.fongame.setStyleSheet("""
+                                        border-radius: 0px;
+                                        min-height: 600px;
+                                        max-height: 600px;
+                                        min-width: 800px;
+                                        max-width: 800px;
+                                        background: white;
+                                    """)
+            opacity_effect = QGraphicsOpacityEffect()
+            opacity_effect.setOpacity(0.7)
+            self.fongame.setGraphicsEffect(opacity_effect)
+            self.fongame.move(240, 60)
+            self.fongame.setMaximumWidth(800)
+            self.fongame.setMaximumHeight(600)
+            self.fongame.setMinimumWidth(800)
+            self.fongame.setMinimumHeight(600)
+            self.fongame.show()
 
-        self.line = QLabel(self)
-        self.line.setStyleSheet("""
-                                    min-height: 10px;
-                                    max-height: 10px;
-                                    min-width: 800px;
-                                    max-width: 800px;
-                                    background: black;
-                                """)
-        self.line.move(240, 601)
-        self.line.show()
+            self.line = QLabel(self)
+            self.line.setStyleSheet("""
+                                        min-height: 10px;
+                                        max-height: 10px;
+                                        min-width: 800px;
+                                        max-width: 800px;
+                                        background: black;
+                                    """)
+            self.line.move(240, 601)
+            self.line.show()
 
-        self.x_speed = random.choice([-1, 1])
-        self.y_speed = random.choice([-1, 1])
+            self.x_speed = random.choice([-1, 1])
+            self.y_speed = random.choice([-1, 1])
 
-        self.ball = QLabel(self)
-        self.ball.setStyleSheet("""
-                                    border-radius: 15;
-                                    min-height: 30px;
-                                    max-height: 30px;
-                                    min-width: 30px;
-                                    max-width: 30px;
-                                    background: black;
-                                """)
-        self.ball.move(625, 520)
-        self.ball.show()
+            self.ball = QLabel(self)
+            self.ball.setStyleSheet("""
+                                        border-radius: 15;
+                                        min-height: 30px;
+                                        max-height: 30px;
+                                        min-width: 30px;
+                                        max-width: 30px;
+                                        background: black;
+                                    """)
+            self.ball.move(625, 520)
+            self.ball.show()
 
-        self.platform = QLabel(self)
-        self.platform.setStyleSheet("""
-                                    border-radius: 0px;
-                                    min-height: 25px;
-                                    max-height: 25px;
-                                    min-width: 100px;
-                                    max-width: 100px;
-                                    background: black;
-                                """)
-        self.platform.move(590, 550)
-        self.platform.show()
+            self.platform = QLabel(self)
+            self.platform.setStyleSheet("""
+                                        border-radius: 0px;
+                                        min-height: 25px;
+                                        max-height: 25px;
+                                        min-width: 100px;
+                                        max-width: 100px;
+                                        background: black;
+                                    """)
+            self.platform.move(590, 550)
+            self.platform.show()
 
-        self.score = QLabel(self)
-        self.score.setText(str(self.lives))
-        self.score.setStyleSheet("""
-                                    min-height: 30px;
-                                    max-height: 30px;
-                                    min-width: 30px;
-                                    max-width: 30px;
-                                    background: transparent;
-                                    font-size: 30px;
-                                    text-align: center;
-                                """)
-        self.score.move(940, 620)
-        self.score.show()
+            self.score = QLabel(self)
+            self.score.setText(str(self.lives))
+            self.score.setStyleSheet("""
+                                        min-height: 30px;
+                                        max-height: 30px;
+                                        min-width: 30px;
+                                        max-width: 30px;
+                                        background: transparent;
+                                        font-size: 30px;
+                                        text-align: center;
+                                    """)
+            self.score.move(940, 620)
+            self.score.show()
 
-        self.ohehi = QLabel(self)
-        self.ohehi.setText(str(self.kolohehi))
-        self.ohehi.setStyleSheet("""
-                                            min-height: 50px;
-                                            max-height: 50px;
-                                            min-width: 50px;
-                                            max-width: 50px;
-                                            background: transparent;
-                                            font-size: 30px;
-                                            text-align: center;
-                                        """)
-        self.ohehi.move(330, 610)
-        self.ohehi.show()
+            self.ohehi = QLabel(self)
+            self.ohehi.setText(str(self.kolohehi))
+            self.ohehi.setStyleSheet("""
+                                                min-height: 50px;
+                                                max-height: 50px;
+                                                min-width: 50px;
+                                                max-width: 50px;
+                                                background: transparent;
+                                                font-size: 30px;
+                                                text-align: center;
+                                            """)
+            self.ohehi.move(330, 610)
+            self.ohehi.show()
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.game_loop)
+            self.timer = QTimer()
+            self.timer.timeout.connect(self.game_loop)
 
     def game_loop(self):
         self.timer.start(10)
@@ -207,7 +210,7 @@ class MainWin(QMainWindow):
             self.lives -= 1  # Уменьшаем количество жизней при вылете мяча за нижнюю границу
             self.score.setText(str(self.lives))
             if self.lives == 0:
-                if self.kolzap < 2:
+                if self.kolzap < 10:
                     with open('results.json') as json_file:
                         data = json.load(json_file)
                         data.append(self.kolohehi)
@@ -371,6 +374,33 @@ class MainWin(QMainWindow):
                     self.show_label(str(result + 1), 420, horizontal_label)
 
                     horizontal_label += 40
+
+    def show_info_messagebox(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setText("Для продолжения нужно очистить таблицу результатов. Очистить?")
+        msg.setWindowTitle("УПС")
+        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+
+        button_yes = msg.button(QMessageBox.Yes)
+        button_yes.setText("Да")
+        button_yes.clicked.connect(self.clear_results_message)
+
+        button_no = msg.button(QMessageBox.No)
+        button_no.setText("Нет")
+
+        retval = msg.exec_()
+
+    def clear_results_message(self):
+        self.kolzap = 0
+        with open('results.json', 'r') as file:
+            data = file.read()
+
+        data_without_brackets = re.sub(r'\[.*?\]', '[]', data)
+
+        with open('results.json', 'w') as file:
+            file.write(data_without_brackets)
+        pass
 
     def clear_results(self):
         self.kolzap = 0
