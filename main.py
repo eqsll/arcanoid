@@ -21,21 +21,21 @@ class MainWin(QMainWindow):
     def game_win(self):
         self.clear_window()
         self.timer.stop()
-        self.setStyleSheet('background-image: url("pob.png");')
+        self.setStyleSheet('background-image: url("images/pob.png");')
 
     def game_over(self):
         self.clear_window()
         self.timer.stop()
-        self.setStyleSheet('background-image: url("poraj.png");')
+        self.setStyleSheet('background-image: url("images/poraj.png");')
 
     def pravila(self):
         self.clear_window()
-        self.setStyleSheet('background-image: url("pravila.png");')
+        self.setStyleSheet('background-image: url("images/pravila.png");')
 
         self.btns5 = QtWidgets.QPushButton('', self)
         self.btns5.setGeometry(0, 0, 100, 100)
         self.btns5.setStyleSheet("""
-                                            background-image: url("naz.png");
+                                            background-image: url("images/naz.png");
                                             min-height: 100px;
                                             max-height: 100px;
                                             min-width: 100px;
@@ -49,7 +49,7 @@ class MainWin(QMainWindow):
 
     def main_screen(self):
         self.clear_window()
-        self.setStyleSheet('background-image: url("menu.jpg");')
+        self.setStyleSheet('background-image: url("images/menu.jpg");')
         btn_style = "border-radius: 35px;" \
                     "background: #008cff;" \
                     "color: #f7dfea;" \
@@ -76,7 +76,7 @@ class MainWin(QMainWindow):
         self.btns4 = QtWidgets.QPushButton('', self)
         self.btns4.setGeometry(0, 0, 100, 100)
         self.btns4.setStyleSheet("""
-                                            background-image: url("vop.png");
+                                            background-image: url("images/vop.png");
                                             min-height: 100px;
                                             max-height: 100px;
                                             min-width: 100px;
@@ -93,7 +93,7 @@ class MainWin(QMainWindow):
             self.show_info_messagebox()
         else:
             self.clear_window()
-            self.setStyleSheet('background-image: url("play.jpg");')
+            self.setStyleSheet('background-image: url("images/play.jpg");')
 
             for i in range(5):
                 block = QLabel(self)
@@ -294,11 +294,11 @@ class MainWin(QMainWindow):
 
     def second_screen(self):
         self.clear_window()
-        self.setStyleSheet("""background-image: url("resul.png");""")
+        self.setStyleSheet("""background-image: url("images/resul.png");""")
         self.btns2 = QtWidgets.QPushButton('', self)
         self.btns2.setGeometry(0, 0, 100, 100)
         self.btns2.setStyleSheet("""
-                                    background-image: url("naz.png");
+                                    background-image: url("images/naz.png");
                                     min-height: 100px;
                                     max-height: 100px;
                                     min-width: 100px;
